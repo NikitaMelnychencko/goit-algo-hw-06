@@ -8,14 +8,14 @@ def parse_input(user_input):
     return cmd, *args
 
 def validate_args(args, required_count, error_message):
-    """Перевіряє, чи достатньо аргументів для команди"""
+    """Checks if there are enough arguments for the command"""
     if len(args) < required_count:
         print(error_message)
         return False
     return True
 
 def find_contact_safe(contacts, name):
-    """Безпечно знаходить контакт за іменем"""
+    """Safely finds contact by name"""
     try:
         return contacts.find(name)
     except:
@@ -61,7 +61,7 @@ def main():
             case "hello":
                 print("How can I help you?")
             case "add":
-                is_valid = validate_args(args, 2, "Будь ласка, вкажіть ім'я та номер телефону")
+                is_valid = validate_args(args, 2, "Please provide name and phone number")
                 if is_valid:
                     record = find_contact_safe(contacts, args[0])
                     if record:
@@ -69,14 +69,14 @@ def main():
                         print(contacts)
                     else:
                         record = Record(args[0])
-                        # Перевіряємо, чи валідне ім'я та чи не пусте воно
+                        # Check if the name is valid and not empty
                         if hasattr(record.name, 'value') and record.name.value != "":
                             record.add_phone(args[1])
                             if len(record.phones) > 0:
                                 contacts.add_record(record)
                                 print(contacts)
             case "change":
-                if not validate_args(args, 3, "Будь ласка, вкажіть ім'я, старий та новий номер телефону"):
+                if not validate_args(args, 3, "Please provide name, old phone number and new phone number"):
                     continue
 
                 record = find_contact_safe(contacts, args[0])
@@ -84,19 +84,19 @@ def main():
                     record.edit_phone(args[1], args[2])
                     print(contacts)
                 else:
-                    print("Контакт не знайдено")
+                    print("Contact not found")
             case "phone":
-                if not validate_args(args, 1, "Будь ласка, вкажіть ім'я"):
+                if not validate_args(args, 1, "Please provide name"):
                     continue
 
                 record = find_contact_safe(contacts, args[0])
                 if record:
                     print(record)
                 else:
-                    print("Контакт не знайдено")
+                    print("Contact not found")
 
             case "remove_phone":
-                if not validate_args(args, 2, "Будь ласка, вкажіть ім'я та номер телефону"):
+                if not validate_args(args, 2, "Please provide name and phone number"):
                     continue
 
                 record = find_contact_safe(contacts, args[0])
@@ -104,10 +104,10 @@ def main():
                     record.remove_phone(args[1])
                     print(contacts)
                 else:
-                    print("Контакт не знайдено")
+                    print("Contact not found")
 
             case "remove":
-                if not validate_args(args, 1, "Будь ласка, вкажіть ім'я"):
+                if not validate_args(args, 1, "Please provide name"):
                     continue
 
                 record = find_contact_safe(contacts, args[0])
@@ -115,17 +115,17 @@ def main():
                     contacts.delete(args[0])
                     print(contacts)
                 else:
-                    print("Контакт не знайдено")
+                    print("Contact not found")
 
             case "all":
                 print(contacts)
             case "exit" | "close":
                 all_contacts = contacts.get_all_contacts()
                 data.save_data(all_contacts)
-                print("До побачення!")
+                print("Goodbye!")
                 break
             case _:
-                log_error("Невірна команда.")
+                log_error("Invalid command.")
 
 if __name__ == "__main__":
     main()

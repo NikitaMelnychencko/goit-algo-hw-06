@@ -14,7 +14,6 @@ class Name(Field):
   @input_error
   def __init__(self, value):
     if not value.isalpha():
-      # self.value = ""  # Встановлюємо порожнє значення при невалідному імені
       raise ValueError("Name must contain only letters")
     self.value = value
 
