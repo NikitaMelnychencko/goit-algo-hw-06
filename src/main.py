@@ -38,8 +38,10 @@ commands = """
   1. hello
   2. add <username> <phone>
   3. change <username> <old_phone> <new_phone>
-  4. remove phone in contact <username> <phone>
-  5. remove contact <username>
+  4. remove_phone <username> <phone>
+    Description: remove phone from contact
+  5. remove <username>
+    Description: remove contact
   6. phone <username>
   7. all
   8. close, exit
