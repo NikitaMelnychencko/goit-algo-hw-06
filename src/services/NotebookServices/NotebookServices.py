@@ -60,6 +60,21 @@ class Record(Record):
         return p
     return None
 
+  def to_dict(self):
+    """Converts Record to dictionary for JSON serialization"""
+    return {
+      "name": self.name.value,
+      "phones": [p.value for p in self.phones]
+    }
+
+  @classmethod
+  def from_dict(cls, data):
+    """Creates Record from dictionary after JSON deserialization"""
+    record = cls(data["name"])
+    for phone in data.get("phones", []):
+      record.add_phone(phone)
+    return record
+
   def __str__(self):
     if len(self.phones) > 0 and self.name.value != "":
       return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -68,7 +83,14 @@ class Record(Record):
 
 class AddressBook(UserDict):
   def __init__(self, initial_contacts=None):
-    self.data = initial_contacts if initial_contacts else {}
+    if initial_contacts and isinstance(list(initial_contacts.values())[0] if initial_contacts else None, dict):
+      # If data came from JSON (as dictionaries), convert them to Record objects
+      self.data = {}
+      for name, contact_data in initial_contacts.items():
+        self.data[name] = Record.from_dict(contact_data)
+    else:
+      # If data are already Record objects
+      self.data = initial_contacts if initial_contacts else {}
 
   def add_record(self, record):
     self.data[record.name.value] = record
@@ -82,10 +104,10 @@ class AddressBook(UserDict):
   def delete(self, name):
     del self.data[name]
 
-
   @input_error
-  def get_all_contacts(self):
-    return self.data
+  def get_contacts_for_json(self):
+    """Returns contacts in format suitable for JSON serialization"""
+    return {name: record.to_dict() for name, record in self.data.items()}
 
   def __str__(self):
     return "\n".join(str(record) for record in self.data.values())

@@ -7,6 +7,7 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
 
+
 def validate_args(args, required_count, error_message):
     """Checks if there are enough arguments for the command"""
     if len(args) < required_count:
@@ -55,7 +56,11 @@ def main():
 
     while True:
         user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
+        try:
+            command, *args = parse_input(user_input)
+        except Exception as e:
+            log_error("Invalid command.")
+            continue
 
         match (command.lower()):
             case "hello":
@@ -120,7 +125,7 @@ def main():
             case "all":
                 print(contacts)
             case "exit" | "close":
-                all_contacts = contacts.get_all_contacts()
+                all_contacts = contacts.get_contacts_for_json()
                 data.save_data(all_contacts)
                 print("Goodbye!")
                 break
