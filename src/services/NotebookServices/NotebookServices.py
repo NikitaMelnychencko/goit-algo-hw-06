@@ -11,8 +11,10 @@ class Field:
     return str(self.value)
 
 class Name(Field):
+  @input_error
   def __init__(self, value):
     if not value.isalpha():
+      # self.value = ""  # Встановлюємо порожнє значення при невалідному імені
       raise ValueError("Name must contain only letters")
     self.value = value
 
@@ -30,7 +32,7 @@ class Phone(Field):
 @dataclass
 class Record:
   name: Name
-  phones: list[Phone]
+  phones: list[Phone] | None
 
 class Record(Record):
   def __init__(self, name):
@@ -38,11 +40,14 @@ class Record(Record):
     self.phones = []
 
   def add_phone(self, phone):
-    self.phones.append(Phone(phone))
+    phone_at_list = Phone(phone)
+    if hasattr(phone_at_list, 'value') and phone_at_list.value != "":
+      self.phones.append(phone_at_list)
 
   def remove_phone(self, phone):
     self.phones = [p for p in self.phones if p.value != phone]
 
+  @input_error
   def edit_phone(self, old_phone, new_phone):
     for p in self.phones:
       if p.value == old_phone:
@@ -57,7 +62,9 @@ class Record(Record):
     return None
 
   def __str__(self):
-    return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+    if len(self.phones) > 0 and self.name.value != "":
+      return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+    return ""
 
 
 class AddressBook(UserDict):
@@ -82,5 +89,4 @@ class AddressBook(UserDict):
     return self.data
 
   def __str__(self):
-    print(self.data.values())
     return "\n".join(str(record) for record in self.data.values())

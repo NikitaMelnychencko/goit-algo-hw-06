@@ -53,7 +53,6 @@ def main():
     print("Welcome to the assistant bot!")
     print(commands)
 
-
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
@@ -62,17 +61,20 @@ def main():
             case "hello":
                 print("How can I help you?")
             case "add":
-                if not validate_args(args, 2, "Будь ласка, вкажіть ім'я та номер телефону"):
-                    continue
-                record = find_contact_safe(contacts, args[0])
-                if record:
-                    record.add_phone(args[1])
-                    print(contacts)
-                else:
-                    record = Record(args[0])
-                    record.add_phone(args[1])
-                    contacts.add_record(record)
-                    print(contacts)
+                is_valid = validate_args(args, 2, "Будь ласка, вкажіть ім'я та номер телефону")
+                if is_valid:
+                    record = find_contact_safe(contacts, args[0])
+                    if record:
+                        record.add_phone(args[1])
+                        print(contacts)
+                    else:
+                        record = Record(args[0])
+                        # Перевіряємо, чи валідне ім'я та чи не пусте воно
+                        if hasattr(record.name, 'value') and record.name.value != "":
+                            record.add_phone(args[1])
+                            if len(record.phones) > 0:
+                                contacts.add_record(record)
+                                print(contacts)
             case "change":
                 if not validate_args(args, 3, "Будь ласка, вкажіть ім'я, старий та новий номер телефону"):
                     continue
@@ -80,9 +82,9 @@ def main():
                 record = find_contact_safe(contacts, args[0])
                 if record:
                     record.edit_phone(args[1], args[2])
+                    print(contacts)
                 else:
                     print("Контакт не знайдено")
-                print(contacts)
             case "phone":
                 if not validate_args(args, 1, "Будь ласка, вкажіть ім'я"):
                     continue
@@ -100,7 +102,7 @@ def main():
                 record = find_contact_safe(contacts, args[0])
                 if record:
                     record.remove_phone(args[1])
-                    print(f"Телефон видалено з контакту {args[0]}")
+                    print(contacts)
                 else:
                     print("Контакт не знайдено")
 
@@ -108,8 +110,12 @@ def main():
                 if not validate_args(args, 1, "Будь ласка, вкажіть ім'я"):
                     continue
 
-                contacts.delete(args[0])
-                print(f"Контакт {args[0]} видалено")
+                record = find_contact_safe(contacts, args[0])
+                if record:
+                    contacts.delete(args[0])
+                    print(contacts)
+                else:
+                    print("Контакт не знайдено")
 
             case "all":
                 print(contacts)
