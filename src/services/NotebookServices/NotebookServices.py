@@ -48,9 +48,11 @@ class Record(Record):
 
   @input_error
   def edit_phone(self, old_phone, new_phone):
-    for p in self.phones:
+    for i, p in enumerate(self.phones):
       if p.value == old_phone:
-        p.value = new_phone
+        phone_at_list = Phone(new_phone)
+        if hasattr(phone_at_list, 'value') and phone_at_list.value != "":
+          self.phones[i] = phone_at_list
         return
     raise ValueError(f"Phone {old_phone} not found")
 
